@@ -3,7 +3,7 @@ class Try < ActiveRecord::Base
   after_save :cumulate_score
   validates :score, presence: true
   validates :score, :numericality => true
-  validates :score, :inclusion => { :in => 1..10, :message => "The score can only be between 0 and 10" }
+  validates :score, :inclusion => { :in => 0..10, :message => "The score can only be between 0 and 10" }
 
   def prev
     Try.joins(:frame).where("frames.game_id = ? and tries.id < ?", self.frame.game_id, self.id).last
@@ -11,50 +11,38 @@ class Try < ActiveRecord::Base
 
   def cumulate_score
 
-    puts "position #{self.position}"
-    parent = self.frame
-    # check whether strike or spare
+
+    currrent_framce = self.frame
 
     if self.score  == 10 && self.position == 1 && self.frame.game.frames.count != 10
-      parent.strike = true
+      currrent_framce.strike = true # if its a strike we save the information
     elsif self.position == 2 && (self.prev.score + self.score) == 10 && self.frame.game.frames.count != 10
-        parent.spare = true
+        currrent_framce.spare = true # if it's a spare, we save the information
     end
 
 
-    if self.position == 2
-      puts "position 2"
-      if self.prev && self.prev.prev && self.prev.prev.score == 10
-        puts "second score after strike"
+    if self.position == 2 # if its the second try
+      if self.prev && self.prev.prev && self.prev.prev.score == 10 # if 2 tries are passed, so that we give the nobus
         self.prev.prev.frame.update_spare (self.score + self.prev.score)
       end
-      if (self.prev.score + self.score) != 10
-        puts "its not a spare"
-        parent.update_spare 0
+      if (self.prev.score + self.score) != 10 # if its not a spare, we simply update the total score of the frame
+        currrent_framce.update_spare 0
       end
-    elsif self.position == 1
-      if parent.prev.try(:spare)
-        parent.prev.update_spare self.score
+    elsif self.position == 1  # if it's the first try
+      if currrent_framce.prev.try(:spare)  # if the previuos is a spare, we add the nobus to previous score
+        currrent_framce.prev.update_spare self.score
       elsif self.prev && self.prev.prev && self.prev.prev.score == 10 #time to update
         self.prev.prev.frame.update_spare (self.score + self.prev.score)
-      elsif self.frame.game.frames.count == 10
-        parent.prev.update_spare 0
+      elsif self.frame.game.frames.count == 10 # if it's the last frame, we simply cumulate the score
+        currrent_framce.prev.update_spare 0
       end
-      # parent.update_total self.score
-      # if self.prev.prev.strike == 10
-      #   self.prev.prev.frame.update_total self.prev.score + self.score
-      #   parent.update_total self.score
-      # end
     else
-      parent.update_spare 0
+      currrent_framce.update_spare 0
     end
 
-
-    parent.save
+    currrent_framce.save
 
   end
-
-
 
 
 end

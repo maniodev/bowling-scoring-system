@@ -1,7 +1,7 @@
 class Frame < ActiveRecord::Base
   belongs_to :game, :counter_cache => true
   has_many :tries
-  after_save :update_total_score
+  # after_save :update_total_score
   # after_create :initialize_total
 
   def prev
@@ -17,17 +17,14 @@ class Frame < ActiveRecord::Base
   end
 
   def update_total score
-    # if self.tries.count == 0
-    # if self.prev
         self.update_attributes(:total => self.total + score)
-
   end
 
 
-  def update_total_score
-    game = self.game
-    game.score = game.frames.pluck(:total).inject(:+)
-    game.save
-  end
+  # def update_total_score
+  #   game = self.game
+  #   game.score = game.frames.pluck(:total).inject(:+)
+  #   game.save
+  # end
 
 end
