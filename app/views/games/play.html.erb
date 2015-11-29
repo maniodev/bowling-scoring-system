@@ -1,0 +1,54 @@
+<style>
+table {
+  font-size: 20px;
+}
+</style>
+
+<h1 align="center">Bowling Scoring</h1>
+<hr>
+<div class="text-center" style="padding-top:50px">
+  <% if @try.errors.any? %>
+      <div class="alert alert-danger">
+        <%= @try.errors.full_messages.first  %>
+      </div>
+    <% end %>
+<% current_game.frames.each do |frame| %>
+<table class="table " align="center" style="display:inline-block;width:60px">
+  <tr >
+    <th >&nbsp;&nbsp;&nbsp;&nbsp;</th>
+    <% frame.tries.each do |try| %>
+    <th class ="active"><%= if try.score == 10 then "X" elsif try.score == 0 then "-" elsif (frame.tries.pluck(:score).inject(:+) == 10 && try.position == 2) then "/" else try.score end%></th>
+    <% end %>
+  </tr>
+  <tr>
+    <td colspan="3" align="right" class=""> <%= frame.total %> </td>
+  </tr>
+</table>
+<% end %>
+<%if current_game.is_game_over? %>
+<table class="table " align="center" style="display:inline-block;width:60px;padding-left:10px">
+  <tr >
+    <th Total</th>
+    <th class ="active">Total</th>
+  </tr>
+  <tr>
+    <td colspan="3" align="right" class=""> <%= current_game.score %> </td>
+  </tr>
+</table>
+<% end %>
+
+
+<%if !current_game.is_game_over? %>
+  <%= form_for @try, :url => {:action => "update", :controller => "games"}, class: "" do |f| %>
+  <div class="form-group " style="">
+      <%= f.text_field :score, autofocus: true, class: "form-control" ,style:"width:400px;margin: 0 auto;"%>
+  </div>
+        <%= f.submit "submit", class: "btn btn-primary" %>
+  <% end %>
+<% else %>
+<p>
+The game is over
+<%= link_to "Start a new Game", games_initialize_game_path%>
+</p>
+<% end %>
+</div>

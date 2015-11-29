@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151129050812) do
+ActiveRecord::Schema.define(version: 20151129071923) do
 
   create_table "frames", force: :cascade do |t|
     t.integer  "game_id"
@@ -25,9 +25,10 @@ ActiveRecord::Schema.define(version: 20151129050812) do
   add_index "frames", ["game_id"], name: "index_frames_on_game_id"
 
   create_table "games", force: :cascade do |t|
-    t.integer  "frames_count"
-    t.datetime "created_at",   null: false
-    t.datetime "updated_at",   null: false
+    t.integer  "frames_count", default: 0
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+    t.integer  "score",        default: 0
   end
 
   create_table "tries", force: :cascade do |t|
