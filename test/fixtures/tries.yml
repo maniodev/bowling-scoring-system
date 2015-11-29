@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  frame_id: 
+  position: 1
+  score: 1
+
+two:
+  frame_id: 
+  position: 1
+  score: 1
