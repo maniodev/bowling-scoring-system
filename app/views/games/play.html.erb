@@ -12,24 +12,38 @@ table {
         <%= @try.errors.full_messages.first  %>
       </div>
     <% end %>
-<% current_game.frames.each do |frame| %>
-<table class="table " align="center" style="display:inline-block;width:60px">
-  <tr >
-    <th >&nbsp;&nbsp;&nbsp;&nbsp;</th>
-    <% frame.tries.each do |try| %>
-    <th class ="active"><%= if try.score == 10 && try.position==1 then "X" elsif try.score == 0 then "-" elsif (frame.tries.pluck(:score).inject(:+) == 10 && try.position == 2) then "/" else try.score end%></th>
+<% current_game.frames.each_with_index do |frame, idx| %>
+<table class="table "   align="center" style="display:inline-table;width:60px;">
+  <tr style="">
+    <!-- <th >&nbsp;&nbsp;&nbsp;&nbsp;</th> -->
+    <% frame.tries.each_with_index do |try,index| %>
+
+    <td class ="active">
+    <% if try.score == 10 #&& (try.position==1 || index >= 9)
+      if idx < 9
+        concat "&nbsp;&nbsp;&nbsp;".html_safe
+      end
+      concat "X"
+    elsif try.score == 0
+      concat "-"
+    elsif (frame.tries.pluck(:score)[0..index].inject(:+) == 10 && try.position >= 2 ) #|| (index >= 9 && try.position == 3 && frame.tries.pluck(:score).last(2).inject(:+) == 10)
+      concat "/"
+    else
+      # concat frame.tries.pluck(:score)[0..index].inspect
+      concat try.score
+    end %>
+  </td>
     <% end %>
   </tr>
   <tr>
-    <td colspan="3" align="right" class=""> <%= frame.total %> </td>
+    <td colspan="3" align="right" > <%= frame.total %> </td>
   </tr>
 </table>
 <% end %>
 <%if current_game.is_game_over? %>
-<table class="table " align="center" style="display:inline-block;width:60px;padding-left:10px">
+<table class="table " align="center" style="display:inline-table;width:60px;padding-left:10px">
   <tr >
-    <th Total</th>
-    <th class ="active">Total</th>
+    <td class ="active">Total</td>
   </tr>
   <tr>
     <td colspan="3" align="right" class=""> <%= current_game.frames.last.total %> </td>
@@ -52,3 +66,12 @@ The game is over
 </p>
 <% end %>
 </div>
+
+<style>
+table tr td:last-child {
+  border-right: solid;
+}
+</style>
+<!-- <script type="text/javascript">
+  $("tr td:last").css("border-right", "solid");
+</script> -->
